@@ -1,0 +1,6 @@
+{
+  "name": "GVD Auto World",
+  "description": "Comprehensive auto service, job cards, 360° health reports, inventory, and vehicle care management for GVD Auto World.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
