@@ -71,6 +71,8 @@ import com.example.data.local.entities.JobCardEntity
 import com.example.model.ItemCategory
 import com.example.model.JobCardStatus
 import com.example.model.VehicleType
+import com.example.model.toDentPhotoItems
+import com.example.ui.components.JobCardDentGallery
 import com.example.ui.components.PaymentGatewayDialog
 import com.example.ui.components.VehicleQrPassDialog
 import com.example.ui.theme.CrimsonRed
@@ -475,21 +477,31 @@ fun EstimateTabContent(jobCard: JobCardEntity) {
 
 @Composable
 fun JobCardFullTabContent(jobCard: JobCardEntity) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            Text(text = "Vehicle Condition & Checklist", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            BillingLineItem("Odometer Reading", "${jobCard.odometerKm} KM")
-            BillingLineItem("Fuel Level", "${jobCard.fuelLevelPercent}%")
-            BillingLineItem("Accessories", jobCard.accessoriesNotes.ifBlank { "Standard Tools" })
-            BillingLineItem("Customer Voice", jobCard.customerVoice.ifBlank { "Regular Service & Inspection" })
-            BillingLineItem("Dent / Scratch Marks", jobCard.dentNotes.ifBlank { "None noted" })
-            BillingLineItem("Promised Delivery", jobCard.deliveryDateTime)
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(modifier = Modifier.padding(14.dp)) {
+                Text(text = "Vehicle Condition & Checklist", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                BillingLineItem("Odometer Reading", "${jobCard.odometerKm} KM")
+                BillingLineItem("Fuel Level", "${jobCard.fuelLevelPercent}%")
+                BillingLineItem("Accessories", jobCard.accessoriesNotes.ifBlank { "Standard Tools" })
+                BillingLineItem("Customer Voice", jobCard.customerVoice.ifBlank { "Regular Service & Inspection" })
+                BillingLineItem("Dent / Scratch Marks", jobCard.dentNotes.ifBlank { "None noted" })
+                BillingLineItem("Promised Delivery", jobCard.deliveryDateTime)
+            }
         }
+
+        // 6-Point Vehicle Dent Inspection Photos Gallery
+        val dentPhotos = jobCard.dentPhotosJson.toDentPhotoItems()
+        JobCardDentGallery(
+            photos = dentPhotos,
+            vehicleNumber = jobCard.vehicleNumber,
+            customerName = jobCard.customerName
+        )
     }
 }
 

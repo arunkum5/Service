@@ -74,6 +74,7 @@ import androidx.compose.ui.unit.sp
 import com.example.data.local.entities.JobCardItemEntity
 import com.example.model.ItemCategory
 import com.example.model.VehicleType
+import com.example.ui.components.SixDentPhotosSection
 import com.example.ui.theme.CrimsonRed
 import com.example.ui.theme.DarkCrimson
 import com.example.ui.theme.StatusGood
@@ -147,6 +148,15 @@ fun CreateJobCardScreen(
                     Step2OdometerAndIssues(
                         draft = draft,
                         onUpdateDraft = { viewModel.updateDraft(it) },
+                        onUpdateDentPhoto = { idx, uri, hasDent, sev, notes ->
+                            viewModel.updateDentPhoto(idx, uri, hasDent, sev, notes)
+                        },
+                        onAutoFillDemoDentPhotos = {
+                            viewModel.populateDemoDentPhotos()
+                        },
+                        onClearDentPhotos = {
+                            viewModel.clearDentPhotos()
+                        },
                         onBack = { currentStep = 1 },
                         onNext = { currentStep = 3 }
                     )
@@ -415,6 +425,9 @@ fun Step1VehicleAndCustomer(
 fun Step2OdometerAndIssues(
     draft: com.example.viewmodel.CreateJobCardDraft,
     onUpdateDraft: ((com.example.viewmodel.CreateJobCardDraft) -> com.example.viewmodel.CreateJobCardDraft) -> Unit,
+    onUpdateDentPhoto: (Int, String, Boolean, String, String) -> Unit,
+    onAutoFillDemoDentPhotos: () -> Unit,
+    onClearDentPhotos: () -> Unit,
     onBack: () -> Unit,
     onNext: () -> Unit
 ) {
@@ -572,11 +585,21 @@ fun Step2OdometerAndIssues(
                     OutlinedTextField(
                         value = draft.dentNotes,
                         onValueChange = { dents -> onUpdateDraft { it.copy(dentNotes = dents) } },
-                        label = { Text("Dent / Scratch Inspection Notes") },
+                        label = { Text("Dent / Scratch Inspection Summary") },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
+        }
+
+        // 6 Dent Inspection Photos
+        item {
+            SixDentPhotosSection(
+                dentPhotos = draft.dentPhotos,
+                onUpdatePhoto = onUpdateDentPhoto,
+                onAutoFillDemo = onAutoFillDemoDentPhotos,
+                onClearAll = onClearDentPhotos
+            )
         }
 
         item {

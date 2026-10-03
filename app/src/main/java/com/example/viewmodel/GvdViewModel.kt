@@ -27,6 +27,13 @@ import com.example.model.JobCardStatus
 import com.example.model.UserRole
 import com.example.model.VehicleType
 import com.example.model.VehicleViewAngle
+import com.example.model.DentPhotoItem
+import com.example.model.getDefaultDentInspectionAngles
+import com.example.model.getDemoDentInspectionPhotos
+import com.example.model.toDentPhotosJson
+import com.example.model.toDentPhotoItems
+import com.example.util.ExcelInventoryParser
+import com.example.util.ParsedInventoryItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -49,6 +56,7 @@ data class CreateJobCardDraft(
     val accessories: String = "",
     val customerVoice: String = "",
     val dentNotes: String = "",
+    val dentPhotos: List<DentPhotoItem> = getDefaultDentInspectionAngles(),
     val items: List<JobCardItemEntity> = emptyList(),
     val advancePaid: Double = 0.0,
     val deliveryDateTime: String = "",
@@ -295,7 +303,12 @@ class GvdViewModel(application: Application) : AndroidViewModel(application) {
                 fuelLevelPercent = draft.fuelLevelPercent,
                 accessoriesNotes = draft.accessories,
                 customerVoice = draft.customerVoice,
-                dentNotes = draft.dentNotes,
+                dentNotes = if (draft.dentNotes.isNotBlank()) draft.dentNotes else {
+                    val marked = draft.dentPhotos.filter { it.hasDent || it.severity != "NO_DENT" }
+                    if (marked.isNotEmpty()) marked.joinToString("; ") { "${it.title}: ${it.severityLabel} (${it.notes})" }
+                    else "6-Angle Photo Inspection: All panels clean & verified"
+                },
+                dentPhotosJson = draft.dentPhotos.toDentPhotosJson(),
                 status = JobCardStatus.OPEN,
                 totalSpares = totalSpares,
                 totalLabour = totalLabour,
@@ -317,6 +330,66 @@ class GvdViewModel(application: Application) : AndroidViewModel(application) {
 
             Toast.makeText(context, "Job Card $jcNumber created successfully!", Toast.LENGTH_LONG).show()
             onSuccess(id)
+        }
+    }
+
+    // 6 Dent Inspection Photos helpers
+    fun updateDentPhoto(
+        angleIndex: Int,
+        photoUri: String,
+        hasDent: Boolean,
+        severity: String,
+        notes: String
+    ) {
+        val currentPhotos = _jobCardDraft.value.dentPhotos.toMutableList()
+        if (angleIndex in currentPhotos.indices) {
+            currentPhotos[angleIndex] = currentPhotos[angleIndex].copy(
+                photoUri = photoUri,
+                hasDent = hasDent,
+                severity = severity,
+                notes = notes
+            )
+            _jobCardDraft.value = _jobCardDraft.value.copy(dentPhotos = currentPhotos)
+        }
+    }
+
+    fun populateDemoDentPhotos() {
+        _jobCardDraft.value = _jobCardDraft.value.copy(
+            dentPhotos = getDemoDentInspectionPhotos(),
+            dentNotes = "Minor scratch on front bumper; 1.5-inch parking dent on rear left door; surface scuff on bumper corner."
+        )
+    }
+
+    fun clearDentPhotos() {
+        _jobCardDraft.value = _jobCardDraft.value.copy(
+            dentPhotos = getDefaultDentInspectionAngles()
+        )
+    }
+
+    // Main Inventory Excel / Delivery List Import for Admin
+    fun importExcelPartsBatch(
+        context: Context,
+        items: List<ParsedInventoryItem>,
+        supplier: String,
+        invoiceNo: String,
+        onComplete: (Int, Int) -> Unit = { _, _ -> }
+    ) {
+        viewModelScope.launch {
+            if (items.isEmpty()) {
+                Toast.makeText(context, "No valid items found in spreadsheet", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+
+            val (updated, newCount) = repository.importIncomingPartsBatch(items, supplier, invoiceNo)
+            val totalUnits = items.sumOf { it.quantity }
+
+            Toast.makeText(
+                context,
+                "Imported ${items.size} parts ($totalUnits units)! $updated updated, $newCount new added to stock.",
+                Toast.LENGTH_LONG
+            ).show()
+
+            onComplete(updated, newCount)
         }
     }
 
@@ -499,7 +572,7 @@ class GvdViewModel(application: Application) : AndroidViewModel(application) {
         sb.append("📦 *OFFICIAL PURCHASE ORDER: ${order.poNumber}*\n")
         sb.append("📅 *Status:* ${order.status}\n")
         sb.append("🏢 *Supplier:* ${order.supplierName}\n")
-        sb.append("📍 *Delivery To:* GVD Auto World Workshop, 100 Feet Rd, Indiranagar, Bangalore 560038\n\n")
+        sb.append("📍 *Delivery To:* GVD Auto World Workshop, Vibgyor High School Road, Kundalahalli, Bengaluru 560037 (Maps: https://maps.app.goo.gl/xgdEGHBKRth1TUrs7)\n\n")
         sb.append("*REPLENISHMENT ITEMS (Based on Min Stock):*\n")
         items.forEachIndexed { idx, it ->
             sb.append("${idx + 1}. *${it.partName}* [${it.partNumber}]\n")
@@ -632,7 +705,8 @@ class GvdViewModel(application: Application) : AndroidViewModel(application) {
             DETAILED COMPONENT BREAKDOWN:
             ${inspections.joinToString("\n") { "- ${it.componentName} (${it.angle}): ${it.status.label} | Notes: ${it.technicianNotes.ifBlank { "Standard check" }} | Lifespan: ${it.worksTillInfo}" }}
             
-            Workshop: GVD Auto World, Plot 42, 100 Feet Road, Indiranagar, Bangalore
+            Workshop: GVD Auto World, Vibgyor High School Road, Kundalahalli, Bengaluru 560037
+            Google Maps Location: https://maps.app.goo.gl/xgdEGHBKRth1TUrs7
             Helpline: +91 8698761486
             
             Please view live interactive 360° views and approve repairs on the GVD Auto World App.

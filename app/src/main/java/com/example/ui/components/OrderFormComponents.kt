@@ -222,7 +222,7 @@ fun AutoOrderFormDialog(
                             color = TextDark
                         )
                         Text(
-                            text = "Delivery To: GVD Auto World Bangalore • Indiranagar Hub",
+                            text = "Delivery To: GVD Auto World Bangalore • Kundalahalli Hub (Vibgyor High School Rd)",
                             fontSize = 11.sp,
                             color = TextMuted
                         )

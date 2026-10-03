@@ -76,9 +76,10 @@ import com.example.ui.theme.CrimsonRed
 import com.example.ui.theme.DarkCrimson
 import com.example.ui.theme.StatusGood
 
-const val WORKSHOP_LAT = 12.9716
-const val WORKSHOP_LNG = 77.6412
-const val WORKSHOP_ADDRESS = "Plot 42, 100 Feet Road, HAL 2nd Stage, Indiranagar, Bangalore, Karnataka 560038"
+const val WORKSHOP_LAT = 12.9551796
+const val WORKSHOP_LNG = 77.717493
+const val WORKSHOP_MAPS_SHORT_URL = "https://maps.app.goo.gl/xgdEGHBKRth1TUrs7"
+const val WORKSHOP_ADDRESS = "Vibgyor High School Road, GJM Sai Garden Layout, Kundalahalli, Bengaluru, Karnataka 560037"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,7 +101,7 @@ fun GoogleMapWorkshopLocationScreen(
                             fontSize = 17.sp
                         )
                         Text(
-                            text = "Google Map Location & Direction • Indiranagar Hub",
+                            text = "Google Map Location & Direction • Kundalahalli Hub",
                             color = Color.White.copy(alpha = 0.85f),
                             fontSize = 11.sp
                         )
@@ -219,7 +220,7 @@ fun GoogleMapWorkshopLocationScreen(
                                     Icon(Icons.Default.Verified, contentDescription = null, tint = StatusGood, modifier = Modifier.size(16.dp))
                                 }
                                 Text(
-                                    text = "Central Bangalore Hub • Indiranagar",
+                                    text = "Kundalahalli Hub • Whitefield Corridor",
                                     fontSize = 12.sp,
                                     color = Color.Gray
                                 )
@@ -267,11 +268,11 @@ fun GoogleMapWorkshopLocationScreen(
                         ) {
                             Column {
                                 Text(text = "Estimated Travel Time", fontSize = 11.sp, color = Color.Gray)
-                                Text(text = "approx. 8 mins (2.3 km)", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = CrimsonRed)
+                                Text(text = "approx. 10 mins (3.1 km)", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = CrimsonRed)
                             }
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(text = "Nearby Landmark", fontSize = 11.sp, color = Color.Gray)
-                                Text(text = "Near CMH Metro Station", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                                Text(text = "Near Vibgyor High School Kundalahalli", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                             }
                         }
 
@@ -424,7 +425,7 @@ fun BangaloreCityMapCanvas() {
         val roadColor = Color(0xFFFFFFFF)
         val highwayColor = Color(0xFFFFE0B2)
 
-        // 100 Feet Road (Indiranagar Main Axis)
+        // Kundalahalli Main Road & Vibgyor High School Road Axis
         drawLine(
             color = highwayColor,
             start = Offset(w * 0.55f, 0f),
@@ -524,8 +525,8 @@ fun FacilityRow(text: String) {
 }
 
 fun openGoogleMaps(context: Context) {
-    val gmmIntentUri = Uri.parse("geo:$WORKSHOP_LAT,$WORKSHOP_LNG?q=$WORKSHOP_LAT,$WORKSHOP_LNG(GVD+Auto+World+Bangalore)")
-    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri).apply {
+    val mapsWebUri = Uri.parse(WORKSHOP_MAPS_SHORT_URL)
+    val mapIntent = Intent(Intent.ACTION_VIEW, mapsWebUri).apply {
         setPackage("com.google.android.apps.maps")
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
@@ -533,17 +534,24 @@ fun openGoogleMaps(context: Context) {
     try {
         context.startActivity(mapIntent)
     } catch (e: Exception) {
-        // Fallback to Google Maps Web URL
-        val browserIntent = Intent(
-            Intent.ACTION_VIEW,
-            Uri.parse("https://www.google.com/maps/dir/?api=1&destination=$WORKSHOP_LAT,$WORKSHOP_LNG")
-        ).apply {
+        // Fallback to Google Maps Web URL or Geo Intent
+        val browserIntent = Intent(Intent.ACTION_VIEW, mapsWebUri).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         try {
             context.startActivity(browserIntent)
         } catch (e2: Exception) {
-            Toast.makeText(context, "Unable to open Google Maps", Toast.LENGTH_SHORT).show()
+            val geoIntent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("geo:$WORKSHOP_LAT,$WORKSHOP_LNG?q=$WORKSHOP_LAT,$WORKSHOP_LNG(GVD+Auto+World+Kundalahalli)")
+            ).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            try {
+                context.startActivity(geoIntent)
+            } catch (e3: Exception) {
+                Toast.makeText(context, "Unable to open Google Maps", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
@@ -565,7 +573,7 @@ fun shareLocationViaWhatsApp(context: Context) {
         $WORKSHOP_ADDRESS
         
         Google Maps Navigation Link:
-        https://maps.google.com/?q=$WORKSHOP_LAT,$WORKSHOP_LNG
+        $WORKSHOP_MAPS_SHORT_URL
         
         Working Hours: Mon-Sat 8:30 AM - 8:00 PM
         Contact: +91 8698761486

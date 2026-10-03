@@ -63,10 +63,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.filled.Inventory
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.RemoveCircle
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
 import com.example.data.local.entities.CustomerReviewEntity
+import com.example.data.local.entities.InventoryItemEntity
+import com.example.model.ItemCategory
+import com.example.model.VehicleType
+import com.example.ui.components.ExcelPartsImportDialog
+import com.example.util.ParsedInventoryItem
 import com.example.data.local.entities.ServiceReminderEntity
 import com.example.model.JobCardStatus
 import com.example.ui.components.AdminReplyDialog
@@ -97,9 +115,13 @@ fun AdminOversightScreen(
     val allReminders by viewModel.allReminders.collectAsState()
     val allAppointments by viewModel.allAppointments.collectAsState()
     val allReviews by viewModel.allReviews.collectAsState()
+    val allInventory by viewModel.allInventory.collectAsState()
+    val lowStockInventory by viewModel.lowStockInventory.collectAsState()
 
-    var selectedTab by remember { mutableIntStateOf(0) } // 0: Daily & Monthly Reports, 1: Automated Reminders, 2: Bookings, 3: Reviews
+    var selectedTab by remember { mutableIntStateOf(0) } // 0: Sales, 1: Main Inventory & Excel, 2: Reminders, 3: Bookings, 4: Reviews
     var selectedReviewForReply by remember { mutableStateOf<CustomerReviewEntity?>(null) }
+    var showExcelImportDialog by remember { mutableStateOf(false) }
+    var showAddPartDialog by remember { mutableStateOf(false) }
 
     val todaySales = allJobCards.sumOf { it.totalAmount }
     val monthlySales = todaySales * 4.2 + 84200.0 // monthly projection
@@ -137,16 +159,21 @@ fun AdminOversightScreen(
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text("Auto Reminders (${allReminders.size})", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                    text = { Text("Main Inventory (${allInventory.size})", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
                 )
                 Tab(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
-                    text = { Text("Bookings (${allAppointments.size})", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                    text = { Text("Auto Reminders (${allReminders.size})", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
                 )
                 Tab(
                     selected = selectedTab == 3,
                     onClick = { selectedTab = 3 },
+                    text = { Text("Bookings (${allAppointments.size})", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                )
+                Tab(
+                    selected = selectedTab == 4,
+                    onClick = { selectedTab = 4 },
                     text = { Text("Reviews & Ratings (${allReviews.size})", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
                 )
             }
@@ -161,10 +188,23 @@ fun AdminOversightScreen(
                         totalJobs = allJobCards.size,
                         averageRating = averageRating,
                         totalReviews = allReviews.size,
-                        onViewReviewsClick = { selectedTab = 3 }
+                        onViewReviewsClick = { selectedTab = 4 }
                     )
                 }
                 1 -> {
+                    AdminMainInventoryTab(
+                        allInventory = allInventory,
+                        lowStockInventory = lowStockInventory,
+                        onUploadExcelClick = { showExcelImportDialog = true },
+                        onAddSinglePartClick = { showAddPartDialog = true },
+                        onAdjustStock = { id, amount -> viewModel.adjustStock(id, amount, context) },
+                        onQuickDemoLoad = {
+                            val demoList = com.example.util.ExcelInventoryParser.getDemoIncomingPartsBatch()
+                            viewModel.importExcelPartsBatch(context, demoList, "Bosch & Castrol South India Depot", "INV-2026-OCT-881")
+                        }
+                    )
+                }
+                2 -> {
                     AdminRemindersTab(
                         reminders = allReminders,
                         onDispatch = { reminder ->
@@ -172,10 +212,10 @@ fun AdminOversightScreen(
                         }
                     )
                 }
-                2 -> {
+                3 -> {
                     AdminAppointmentsTab(appointments = allAppointments)
                 }
-                3 -> {
+                4 -> {
                     AdminReviewsTab(
                         reviews = allReviews,
                         onReplyClick = { review -> selectedReviewForReply = review },
@@ -184,6 +224,27 @@ fun AdminOversightScreen(
                 }
             }
         }
+    }
+
+    if (showExcelImportDialog) {
+        ExcelPartsImportDialog(
+            onDismiss = { showExcelImportDialog = false },
+            onConfirmImport = { items, supplier, invoiceNo ->
+                viewModel.importExcelPartsBatch(context, items, supplier, invoiceNo) { _, _ ->
+                    showExcelImportDialog = false
+                }
+            }
+        )
+    }
+
+    if (showAddPartDialog) {
+        AdminAddPartDialog(
+            onDismiss = { showAddPartDialog = false },
+            onAdd = { newItem ->
+                viewModel.addInventoryItem(newItem, context)
+                showAddPartDialog = false
+            }
+        )
     }
 
     if (selectedReviewForReply != null) {
@@ -879,4 +940,434 @@ fun RatingBreakdownRow(
         Text(text = "$count", fontSize = 10.sp, color = Color.Gray, modifier = Modifier.width(16.dp))
     }
 }
+
+@Composable
+fun AdminMainInventoryTab(
+    allInventory: List<InventoryItemEntity>,
+    lowStockInventory: List<InventoryItemEntity>,
+    onUploadExcelClick: () -> Unit,
+    onAddSinglePartClick: () -> Unit,
+    onAdjustStock: (Long, Int) -> Unit,
+    onQuickDemoLoad: () -> Unit
+) {
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedCategoryFilter by remember { mutableStateOf("ALL") }
+
+    val totalStockUnits = allInventory.sumOf { it.stockQuantity }
+    val totalValuation = allInventory.sumOf { it.stockQuantity * it.unitPrice }
+
+    val filteredList = allInventory.filter { item ->
+        val matchesCategory = when (selectedCategoryFilter) {
+            "SPARE" -> item.category == ItemCategory.SPARE
+            "LUBE" -> item.category == ItemCategory.LUBE
+            "DETAILING" -> item.category == ItemCategory.DETAILING
+            "LOW_STOCK" -> item.stockQuantity <= item.minThresholdAlert
+            else -> true
+        }
+        val matchesSearch = searchQuery.isBlank() ||
+                item.partName.contains(searchQuery, ignoreCase = true) ||
+                item.partNumber.contains(searchQuery, ignoreCase = true)
+
+        matchesCategory && matchesSearch
+    }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Warehouse Stats Card
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text("Main Parts Inventory", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, color = TextDark)
+                            Text("Live Warehouse Valuation & Parts Inward", fontSize = 11.sp, color = TextMuted)
+                        }
+                        Surface(
+                            color = DarkCrimson.copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Inventory2, contentDescription = null, tint = CrimsonRed, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("${allInventory.size} SKUs", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = CrimsonRed)
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Surface(
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(8.dp),
+                            color = LightGrayBg
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                Text("TOTAL UNITS", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+                                Text("$totalStockUnits pcs", fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = TextDark)
+                            }
+                        }
+
+                        Surface(
+                            modifier = Modifier.weight(1.3f),
+                            shape = RoundedCornerShape(8.dp),
+                            color = LightGrayBg
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                Text("VALUATION (MRP)", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+                                Text("₹ ${totalValuation.toInt()}", fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = CrimsonRed)
+                            }
+                        }
+
+                        Surface(
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (lowStockInventory.isNotEmpty()) Color(0xFFFFEBEE) else LightGrayBg
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                Text("LOW STOCK", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (lowStockInventory.isNotEmpty()) CrimsonRed else Color.Gray)
+                                Text("${lowStockInventory.size} items", fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = if (lowStockInventory.isNotEmpty()) CrimsonRed else StatusGood)
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // Primary Excel File Upload Actions
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Button(
+                            onClick = onUploadExcelClick,
+                            modifier = Modifier
+                                .weight(1.3f)
+                                .height(44.dp)
+                                .testTag("admin_upload_excel_btn"),
+                            colors = ButtonDefaults.buttonColors(containerColor = CrimsonRed),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Icon(Icons.Default.FileUpload, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Upload Excel / CSV", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+
+                        OutlinedButton(
+                            onClick = onAddSinglePartClick,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(44.dp),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("+ Add Part", fontSize = 11.sp)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    OutlinedButton(
+                        onClick = onQuickDemoLoad,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(38.dp),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(14.dp), tint = CrimsonRed)
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("1-Tap Demo: Import Incoming OEM Parts Delivery", fontSize = 11.sp, color = CrimsonRed, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+        }
+
+        // Search and Filters
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("Search by part name or SKU...", fontSize = 12.sp) },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                        singleLine = true,
+                        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf(
+                            "ALL" to "All (${allInventory.size})",
+                            "SPARE" to "Spares",
+                            "LUBE" to "Lubes",
+                            "DETAILING" to "Detailing",
+                            "LOW_STOCK" to "Low Alert (${lowStockInventory.size})"
+                        ).forEach { (key, label) ->
+                            val isSelected = selectedCategoryFilter == key
+                            FilterChip(
+                                selected = isSelected,
+                                onClick = { selectedCategoryFilter = key },
+                                label = { Text(label, fontSize = 10.sp) },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = if (key == "LOW_STOCK") Color(0xFFFFCDD2) else CrimsonRed.copy(alpha = 0.2f),
+                                    selectedLabelColor = if (key == "LOW_STOCK") CrimsonRed else CrimsonRed
+                                ),
+                                modifier = Modifier.height(28.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Inventory Items List
+        if (filteredList.isEmpty()) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No inventory items found matching filter", color = Color.Gray, fontSize = 13.sp)
+                }
+            }
+        } else {
+            items(filteredList, key = { it.id }) { item ->
+                AdminInventoryItemCard(
+                    item = item,
+                    onAdjustStock = onAdjustStock
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AdminInventoryItemCard(
+    item: InventoryItemEntity,
+    onAdjustStock: (Long, Int) -> Unit
+) {
+    val isLowStock = item.stockQuantity <= item.minThresholdAlert
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = item.partName,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        color = TextDark
+                    )
+                    if (isLowStock) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = "Low Stock",
+                            tint = CrimsonRed,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "SKU: ${item.partNumber}",
+                        fontSize = 11.sp,
+                        color = Color.DarkGray
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "• ${item.category.name}",
+                        fontSize = 10.sp,
+                        color = when (item.category) {
+                            ItemCategory.SPARE -> CrimsonRed
+                            ItemCategory.LUBE -> Color(0xFF1976D2)
+                            ItemCategory.DETAILING -> Color(0xFF7B1FA2)
+                            ItemCategory.LABOUR -> Color(0xFFE65100)
+                        },
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "• ${item.compatibleType.label.take(2)}",
+                        fontSize = 10.sp,
+                        color = Color.Gray
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Unit MRP: ₹ ${item.unitPrice.toInt()}",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = CrimsonRed
+                )
+            }
+
+            Column(horizontalAlignment = Alignment.End) {
+                Surface(
+                    color = if (isLowStock) Color(0xFFFFEBEE) else Color(0xFFE8F5E9),
+                    shape = RoundedCornerShape(6.dp)
+                ) {
+                    Text(
+                        text = "${item.stockQuantity} ${item.unit}",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = if (isLowStock) CrimsonRed else StatusGood,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = { onAdjustStock(item.id, -1) },
+                        modifier = Modifier.size(28.dp),
+                        enabled = item.stockQuantity > 0
+                    ) {
+                        Icon(Icons.Default.RemoveCircle, contentDescription = "Decrease", tint = if (item.stockQuantity > 0) Color.Gray else Color.LightGray, modifier = Modifier.size(18.dp))
+                    }
+                    IconButton(
+                        onClick = { onAdjustStock(item.id, +1) },
+                        modifier = Modifier.size(28.dp)
+                    ) {
+                        Icon(Icons.Default.AddCircle, contentDescription = "Increase", tint = StatusGood, modifier = Modifier.size(18.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AdminAddPartDialog(
+    onDismiss: () -> Unit,
+    onAdd: (InventoryItemEntity) -> Unit
+) {
+    var name by remember { mutableStateOf("") }
+    var sku by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf(ItemCategory.SPARE) }
+    var vehicleType by remember { mutableStateOf(VehicleType.TWO_WHEELER) }
+    var priceStr by remember { mutableStateOf("") }
+    var qtyStr by remember { mutableStateOf("") }
+    var unitStr by remember { mutableStateOf("pcs") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add Part to Main Inventory", fontWeight = FontWeight.Bold, fontSize = 16.sp) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Part Name *") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = sku,
+                    onValueChange = { sku = it },
+                    label = { Text("SKU / Part Number *") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = priceStr,
+                        onValueChange = { priceStr = it },
+                        label = { Text("Price (₹)") },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = qtyStr,
+                        onValueChange = { qtyStr = it },
+                        label = { Text("Initial Qty") },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true
+                    )
+                }
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    listOf(ItemCategory.SPARE, ItemCategory.LUBE, ItemCategory.DETAILING).forEach { cat ->
+                        FilterChip(
+                            selected = category == cat,
+                            onClick = { category = cat },
+                            label = { Text(cat.name, fontSize = 10.sp) },
+                            modifier = Modifier.height(28.dp)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (name.isNotBlank()) {
+                        val newPart = InventoryItemEntity(
+                            partName = name,
+                            partNumber = sku.ifBlank { "SKU-${System.currentTimeMillis() % 1000}" },
+                            category = category,
+                            compatibleType = vehicleType,
+                            unitPrice = priceStr.toDoubleOrNull() ?: 500.0,
+                            stockQuantity = qtyStr.toIntOrNull() ?: 10,
+                            minThresholdAlert = 5,
+                            unit = unitStr
+                        )
+                        onAdd(newPart)
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = CrimsonRed)
+            ) {
+                Text("Add to Stock")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
 

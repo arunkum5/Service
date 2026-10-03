@@ -24,6 +24,7 @@ data class JobCardEntity(
     val accessoriesNotes: String = "",
     val customerVoice: String = "",
     val dentNotes: String = "",
+    val dentPhotosJson: String = "",
     val status: JobCardStatus = JobCardStatus.OPEN,
     val totalSpares: Double = 0.0,
     val totalLabour: Double = 0.0,

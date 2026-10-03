@@ -1,0 +1,567 @@
+{
+  "workshop": {
+    "name": "GVD Auto World",
+    "address": "Vibgyor High School Road, GJM Sai Garden Layout, Kundalahalli, Bengaluru, Karnataka 560037",
+    "coordinates": {
+      "latitude": 12.9551796,
+      "longitude": 77.717493
+    },
+    "googleMapsUrl": "https://maps.app.goo.gl/xgdEGHBKRth1TUrs7",
+    "phone": "+91 98450 12345",
+    "email": "support@gvdautoworld.com"
+  },
+  "masterInventory": [
+    {
+      "id": 1,
+      "partName": "AIR FILTER BIG (Bajaj/Universal)",
+      "partNumber": "SP-BAJ-AF01",
+      "category": "SPARE",
+      "compatibleType": "TWO_WHEELER",
+      "unitPrice": 205.0,
+      "stockQuantity": 32,
+      "minThresholdAlert": 10,
+      "unit": "pcs"
+    },
+    {
+      "id": 2,
+      "partName": "Front Disc Brake Pads (Ceramic)",
+      "partNumber": "SP-BRK-092",
+      "category": "SPARE",
+      "compatibleType": "TWO_WHEELER",
+      "unitPrice": 420.0,
+      "stockQuantity": 14,
+      "minThresholdAlert": 5,
+      "unit": "set"
+    },
+    {
+      "id": 3,
+      "partName": "Tata Nexon OEM Brake Pad Set",
+      "partNumber": "SP-TAT-BP44",
+      "category": "SPARE",
+      "compatibleType": "FOUR_WHEELER",
+      "unitPrice": 2400.0,
+      "stockQuantity": 8,
+      "minThresholdAlert": 4,
+      "unit": "set"
+    },
+    {
+      "id": 4,
+      "partName": "Activated Carbon AC Cabin Filter",
+      "partNumber": "SP-AC-CF12",
+      "category": "SPARE",
+      "compatibleType": "FOUR_WHEELER",
+      "unitPrice": 800.0,
+      "stockQuantity": 18,
+      "minThresholdAlert": 5,
+      "unit": "pcs"
+    },
+    {
+      "id": 5,
+      "partName": "Motul 7100 10W50 100% Synthetic 1L",
+      "partNumber": "LB-MOT-10W50",
+      "category": "LUBE",
+      "compatibleType": "TWO_WHEELER",
+      "unitPrice": 450.0,
+      "stockQuantity": 45,
+      "minThresholdAlert": 15,
+      "unit": "can"
+    },
+    {
+      "id": 6,
+      "partName": "Castrol Magnatec 5W30 Full Synth 3.5L",
+      "partNumber": "LB-CAS-5W30",
+      "category": "LUBE",
+      "compatibleType": "FOUR_WHEELER",
+      "unitPrice": 1850.0,
+      "stockQuantity": 12,
+      "minThresholdAlert": 4,
+      "unit": "can"
+    },
+    {
+      "id": 7,
+      "partName": "TPU Paint Protection Film (Roll 15m)",
+      "partNumber": "DT-PPF-TPU15",
+      "category": "DETAILING",
+      "compatibleType": "FOUR_WHEELER",
+      "unitPrice": 18500.0,
+      "stockQuantity": 3,
+      "minThresholdAlert": 2,
+      "unit": "roll"
+    },
+    {
+      "id": 8,
+      "partName": "9H Diamond Ceramic Coating Kit (50ml)",
+      "partNumber": "DT-CRM-9H",
+      "category": "DETAILING",
+      "compatibleType": "FOUR_WHEELER",
+      "unitPrice": 3500.0,
+      "stockQuantity": 7,
+      "minThresholdAlert": 3,
+      "unit": "box"
+    },
+    {
+      "id": 9,
+      "partName": "Chain Lube & Cleaner Combo Pack",
+      "partNumber": "LB-CHN-CMB",
+      "category": "LUBE",
+      "compatibleType": "TWO_WHEELER",
+      "unitPrice": 380.0,
+      "stockQuantity": 22,
+      "minThresholdAlert": 6,
+      "unit": "pack"
+    },
+    {
+      "id": 10,
+      "partName": "NGK Iridium Spark Plug CR8EIX",
+      "partNumber": "SP-NGK-CR8",
+      "category": "SPARE",
+      "compatibleType": "TWO_WHEELER",
+      "unitPrice": 650.0,
+      "stockQuantity": 2,
+      "minThresholdAlert": 5,
+      "unit": "pcs"
+    }
+  ],
+  "jobCards": [
+    {
+      "id": 1,
+      "jobCardNumber": "JC-2026-0427",
+      "customerName": "Ashay Kohad",
+      "customerMobile": "8698761486",
+      "customerEmail": "tightthenut@gmail.com",
+      "vehicleNumber": "MH12RY1234",
+      "vehicleType": "TWO_WHEELER",
+      "make": "Bajaj",
+      "model": "Bajaj Avenger",
+      "variant": "150 Street",
+      "odometerKm": 25625,
+      "fuelLevelPercent": 51,
+      "accessoriesNotes": "Luggage carrier, Crash guard installed",
+      "customerVoice": "Chain noise on deceleration, front brake squeal, minor vibration above 60 km/h",
+      "dentNotes": "Minor scratch on left silencer shield, front fender clear",
+      "dentPhotos": [
+        {
+          "angleIndex": 0,
+          "angleKey": "FRONT",
+          "title": "1. Front Angle",
+          "description": "Front Bumper, Hood, Grille, Headlights & Fog Lamps",
+          "photoUri": "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800",
+          "hasDent": true,
+          "severity": "MINOR_SCRATCH",
+          "notes": "Hairline stone-chip scratches on lower bumper lip"
+        },
+        {
+          "angleIndex": 1,
+          "angleKey": "REAR",
+          "title": "2. Rear Angle",
+          "description": "Boot / Tailgate, Rear Bumper, Taillights & Exhaust Tip",
+          "photoUri": "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800",
+          "hasDent": false,
+          "severity": "NO_DENT",
+          "notes": "Rear bootlid and bumper completely pristine"
+        },
+        {
+          "angleIndex": 2,
+          "angleKey": "LEFT_SIDE",
+          "title": "3. Left Side Profile",
+          "description": "Left Doors, Front/Rear Fenders, Running Board & Mirrors",
+          "photoUri": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800",
+          "hasDent": true,
+          "severity": "MEDIUM_DENT",
+          "notes": "1.5 inch parking dent on rear left passenger door"
+        },
+        {
+          "angleIndex": 3,
+          "angleKey": "RIGHT_SIDE",
+          "title": "4. Right Side Profile",
+          "description": "Right Doors, Quarter Panel, Side Skirts & Window Frame",
+          "photoUri": "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800",
+          "hasDent": false,
+          "severity": "NO_DENT",
+          "notes": "Clean right side panels with no visible damage"
+        },
+        {
+          "angleIndex": 4,
+          "angleKey": "ROOF_GLASS",
+          "title": "5. Roof & Glass",
+          "description": "Roof Panel, Sunroof, Front Windshield & Rear Screen",
+          "photoUri": "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800",
+          "hasDent": false,
+          "severity": "NO_DENT",
+          "notes": "Roof and glass in factory condition"
+        },
+        {
+          "angleIndex": 5,
+          "angleKey": "CLOSEUP_DENT",
+          "title": "6. Dent / Scratch Close-Up",
+          "description": "Detailed Zoom of Existing Scratches, Dents or Deep Scrapes",
+          "photoUri": "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=800",
+          "hasDent": true,
+          "severity": "MINOR_SCRATCH",
+          "notes": "Surface rub mark on left silencer shield"
+        }
+      ],
+      "status": "IN_PROGRESS",
+      "totalSpares": 205.0,
+      "totalLabour": 800.0,
+      "totalLubes": 450.0,
+      "totalAmount": 1455.0,
+      "advancePaid": 500.0,
+      "balanceAmount": 955.0,
+      "deliveryDateTime": "2026-09-24 17:30",
+      "isSmsAlertEnabled": true,
+      "isPaidOnline": false,
+      "items": [
+        {
+          "category": "SPARE",
+          "name": "AIR FILTER BIG",
+          "quantity": 1,
+          "unitPrice": 205.0,
+          "totalAmount": 205.0
+        },
+        {
+          "category": "LABOUR",
+          "name": "SERVICING MAJOR (2W)",
+          "quantity": 1,
+          "unitPrice": 800.0,
+          "totalAmount": 800.0
+        },
+        {
+          "category": "LUBE",
+          "name": "MOTUL 7100 10W50 4T (1L)",
+          "quantity": 1,
+          "unitPrice": 450.0,
+          "totalAmount": 450.0
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "jobCardNumber": "JC-2026-0812",
+      "customerName": "Vikram Deshmukh",
+      "customerMobile": "9822019942",
+      "customerEmail": "vikram.deshmukh@gmail.com",
+      "vehicleNumber": "MH12DY7698",
+      "vehicleType": "FOUR_WHEELER",
+      "make": "Tata",
+      "model": "Tata Nexon",
+      "variant": "XZ+ Dark Edition",
+      "odometerKm": 21400,
+      "fuelLevelPercent": 65,
+      "accessoriesNotes": "Dashcam front/rear, 7D Floor mats",
+      "customerVoice": "Need 9H Ceramic coating maintenance, AC filter replacement, Brake pads inspection",
+      "dentNotes": "Slight swirl marks on bonnet, right door small stone chip",
+      "dentPhotos": [],
+      "status": "OPEN",
+      "totalSpares": 3200.0,
+      "totalLabour": 7500.0,
+      "totalLubes": 1800.0,
+      "totalAmount": 12500.0,
+      "advancePaid": 3000.0,
+      "balanceAmount": 9500.0,
+      "deliveryDateTime": "2026-09-25 18:00",
+      "isSmsAlertEnabled": true,
+      "isPaidOnline": false,
+      "items": [
+        {
+          "category": "DETAILING",
+          "name": "9H Ceramic Coating Annual Re-Coat",
+          "quantity": 1,
+          "unitPrice": 5500.0,
+          "totalAmount": 5500.0
+        },
+        {
+          "category": "SPARE",
+          "name": "Front Brake Pad Set (OEM)",
+          "quantity": 1,
+          "unitPrice": 2400.0,
+          "totalAmount": 2400.0
+        },
+        {
+          "category": "SPARE",
+          "name": "Activated Carbon AC Cabin Filter",
+          "quantity": 1,
+          "unitPrice": 800.0,
+          "totalAmount": 800.0
+        },
+        {
+          "category": "LABOUR",
+          "name": "AC Evaporator Foam Deep Clean",
+          "quantity": 1,
+          "unitPrice": 2000.0,
+          "totalAmount": 2000.0
+        },
+        {
+          "category": "LUBE",
+          "name": "DOT 4 High Temp Brake Fluid Flush",
+          "quantity": 1,
+          "unitPrice": 1800.0,
+          "totalAmount": 1800.0
+        }
+      ]
+    }
+  ],
+  "inspectionsMH12RY1234": [
+    {
+      "componentKey": "ENGINE_OIL",
+      "componentName": "Engine Oil & Sump Filter",
+      "category": "Fluid & Lubrication",
+      "angle": "ENGINE_BAY",
+      "status": "SERVICED",
+      "technicianNotes": "Flushed with engine flush. Refilled Motul 7100 10W50.",
+      "worksTillInfo": "Works till next service (5,000 km)",
+      "recommendedAction": "Check level periodically",
+      "replacementCost": 450.0,
+      "lastServicedDate": "2026-09-23"
+    },
+    {
+      "componentKey": "BRAKE_PADS",
+      "componentName": "Front & Rear Brakes (Pads & Fluid)",
+      "category": "Braking & Safety",
+      "angle": "SIDE_LEFT",
+      "status": "NEED_REPLACE",
+      "technicianNotes": "Front pads worn down to 1.8mm (min 2.0mm). Rotor scored.",
+      "worksTillInfo": "Replace immediately (Safe for ~200 km city only)",
+      "recommendedAction": "Replace with Ceramic Disc Pads & DOT 4",
+      "replacementCost": 420.0,
+      "lastServicedDate": "2026-03-10"
+    },
+    {
+      "componentKey": "TIRES",
+      "componentName": "Tires, Alignment & Pressure",
+      "category": "Wheels & Suspension",
+      "angle": "FRONT",
+      "status": "GOOD",
+      "technicianNotes": "Tread depth 5.2mm. Pressure 32 PSI cold.",
+      "worksTillInfo": "Works till next service (15,000 km remaining)",
+      "recommendedAction": "Rotate tires after 8,000 km",
+      "replacementCost": 0.0,
+      "lastServicedDate": "2026-09-23"
+    },
+    {
+      "componentKey": "BATTERY",
+      "componentName": "Battery & Charging System",
+      "category": "Electrical",
+      "angle": "ENGINE_BAY",
+      "status": "GOOD",
+      "technicianNotes": "Resting 12.6V, Cranking 10.4V. Charging 14.2V.",
+      "worksTillInfo": "Health 92%. Works till next service",
+      "recommendedAction": "Keep terminals clean",
+      "replacementCost": 0.0,
+      "lastServicedDate": "2026-09-23"
+    },
+    {
+      "componentKey": "BODY_COATING",
+      "componentName": "Ceramic Glaze & Tank PPF",
+      "category": "Exterior Detailing",
+      "angle": "SIDE_RIGHT",
+      "status": "SERVICED",
+      "technicianNotes": "Hydrophobic ceramic top coat refreshed.",
+      "worksTillInfo": "Works till next booster (6 months)",
+      "recommendedAction": "Use pH-neutral wash shampoo only",
+      "replacementCost": 1200.0,
+      "lastServicedDate": "2026-09-23"
+    },
+    {
+      "componentKey": "CABIN_AC",
+      "componentName": "Air Intake & Throttle Body",
+      "category": "Fuel & Air Delivery",
+      "angle": "INTERIOR",
+      "status": "SERVICED",
+      "technicianNotes": "Throttle body de-carbonized, idle RPM calibrated to 1400.",
+      "worksTillInfo": "Works till next service (10,000 km)",
+      "recommendedAction": "Clean air filter regularly",
+      "replacementCost": 800.0,
+      "lastServicedDate": "2026-09-23"
+    },
+    {
+      "componentKey": "SUSPENSION",
+      "componentName": "Shock Absorbers & Bushings",
+      "category": "Suspension & Handling",
+      "angle": "UNDERBODY",
+      "status": "GOOD",
+      "technicianNotes": "No oil weeping on front fork seals / rear dampers.",
+      "worksTillInfo": "Works till next service",
+      "recommendedAction": "Inspect during next monsoon service",
+      "replacementCost": 0.0,
+      "lastServicedDate": "2026-09-23"
+    },
+    {
+      "componentKey": "EXHAUST",
+      "componentName": "Exhaust Pipe & Catalytic Converter",
+      "category": "Exhaust & Emissions",
+      "angle": "REAR",
+      "status": "GOOD",
+      "technicianNotes": "Emission levels within BS6 norms. Heat shield torqued.",
+      "worksTillInfo": "Works till next service",
+      "recommendedAction": "PUC certificate valid till 2027",
+      "replacementCost": 0.0,
+      "lastServicedDate": "2026-09-23"
+    }
+  ],
+  "showroomVehicles": [
+    {
+      "title": "Royal Enfield Hunter 350 Dapper Ash",
+      "vehicleType": "TWO_WHEELER",
+      "brand": "Royal Enfield",
+      "model": "Hunter 350",
+      "year": 2024,
+      "kmDriven": 4800,
+      "fuelType": "Petrol",
+      "price": 158000.0,
+      "emiStartingAt": 3999.0,
+      "specsSummary": "349cc Single Cylinder, Dual-channel ABS, GVD 50-Point Certified, Ceramic Coated",
+      "condition": "Certified Pre-Owned",
+      "warrantyMonths": 12,
+      "isAvailable": true
+    },
+    {
+      "title": "KTM Duke 390 Gen 3 Electronic Orange",
+      "vehicleType": "TWO_WHEELER",
+      "brand": "KTM",
+      "model": "Duke 390",
+      "year": 2024,
+      "kmDriven": 3200,
+      "fuelType": "Petrol",
+      "price": 285000.0,
+      "emiStartingAt": 6499.0,
+      "specsSummary": "399cc Liquid Cooled, Cornering ABS, Quickshifter+, 1st Owner, Showroom Condition",
+      "condition": "Certified Pre-Owned",
+      "warrantyMonths": 12,
+      "isAvailable": true
+    },
+    {
+      "title": "Tata Nexon XZ+ (S) Dark Edition",
+      "vehicleType": "FOUR_WHEELER",
+      "brand": "Tata",
+      "model": "Nexon",
+      "year": 2023,
+      "kmDriven": 19200,
+      "fuelType": "Diesel",
+      "price": 1145000.0,
+      "emiStartingAt": 18450.0,
+      "specsSummary": "1.5L Revotorq Diesel, Sunroof, Harman Sound, Full Body TPU PPF Installed, 5-Star Safety",
+      "condition": "Certified Pre-Owned",
+      "warrantyMonths": 12,
+      "isAvailable": true
+    },
+    {
+      "title": "Hyundai Creta SX (O) Turbo Knight",
+      "vehicleType": "FOUR_WHEELER",
+      "brand": "Hyundai",
+      "model": "Creta",
+      "year": 2024,
+      "kmDriven": 11000,
+      "fuelType": "Petrol",
+      "price": 1620000.0,
+      "emiStartingAt": 24900.0,
+      "specsSummary": "1.5L Turbo GDi 7-speed DCT, Panoramic Sunroof, ADAS Level 2, GVD Auto Warranty",
+      "condition": "Certified Pre-Owned",
+      "warrantyMonths": 12,
+      "isAvailable": true
+    },
+    {
+      "title": "Yamaha Aerox 155 MotoGP Edition",
+      "vehicleType": "TWO_WHEELER",
+      "brand": "Yamaha",
+      "model": "Aerox 155",
+      "year": 2024,
+      "kmDriven": 2600,
+      "fuelType": "Petrol",
+      "price": 129000.0,
+      "emiStartingAt": 3450.0,
+      "specsSummary": "155cc VVA Liquid Cooled, Traction Control, Keyless Ignition, Pristine Condition",
+      "condition": "Certified Pre-Owned",
+      "warrantyMonths": 12,
+      "isAvailable": true
+    }
+  ],
+  "customerReviews": [
+    {
+      "customerName": "Shashi G",
+      "customerMobile": "9845112233",
+      "vehicleNumber": "KA01MJ9821",
+      "vehicleModel": "Royal Enfield Classic 350",
+      "serviceType": "Periodic Lube & Brake Service",
+      "rating": 5,
+      "aspectPunctuality": 5,
+      "aspectCleanliness": 5,
+      "aspectPricing": 5,
+      "tags": "Transparent Pricing, WhatsApp Alerts, Genuine Spares",
+      "comment": "Superb service experience at GVD Auto World Kundalahalli! The 360-degree digital inspection report sent to my WhatsApp showed exactly which brake pads needed replacement. Completely transparent billing.",
+      "jobCardNumber": "JC-2026-0427",
+      "adminResponse": "Thank you Mr. Shashi! Delighted that our digital 360 inspection provided total clarity. Looking forward to serving your Classic 350 again!",
+      "isVerifiedClient": true
+    },
+    {
+      "customerName": "Rahul Menon",
+      "customerMobile": "9822019942",
+      "vehicleNumber": "KA03HA4321",
+      "vehicleModel": "Hyundai Creta SX(O)",
+      "serviceType": "9H Ceramic Coating & Detailing",
+      "rating": 5,
+      "aspectPunctuality": 5,
+      "aspectCleanliness": 5,
+      "aspectPricing": 4,
+      "tags": "Ceramic Coating, Doorstep Pickup, Flawless Shine",
+      "comment": "Got full body 9H ceramic coating and interior detailing done. The paint depth and water beading are unbelievable! The doorstep pickup from Whitefield was punctual.",
+      "jobCardNumber": "JC-2026-0812",
+      "adminResponse": "Thank you Rahul! Our detailing masters love working on the Creta. Enjoy the unmatched ceramic gloss on Bangalore roads.",
+      "isVerifiedClient": true
+    },
+    {
+      "customerName": "Priya Sharma",
+      "customerMobile": "9766554433",
+      "vehicleNumber": "KA05EB7712",
+      "vehicleModel": "Honda Activa 6G",
+      "serviceType": "General Service & Oil Change",
+      "rating": 4,
+      "aspectPunctuality": 4,
+      "aspectCleanliness": 5,
+      "aspectPricing": 5,
+      "tags": "Courteous Staff, Quality Work, Clean Lounge",
+      "comment": "Very prompt service and clean air-conditioned customer lounge. Staff was courteous and explained the labour invoice line-by-line. Took about 20 mins longer because of rush, but bike feels brand new.",
+      "jobCardNumber": "JC-2026-0904",
+      "adminResponse": "Thanks for your kind words Priya! We appreciate your patience during our morning rush and are thrilled your Activa is riding smoothly.",
+      "isVerifiedClient": true
+    }
+  ],
+  "standard6DentInspectionAngles": [
+    {
+      "angleIndex": 0,
+      "angleKey": "FRONT",
+      "title": "1. Front Angle",
+      "description": "Front Bumper, Hood, Grille, Headlights & Fog Lamps"
+    },
+    {
+      "angleIndex": 1,
+      "angleKey": "REAR",
+      "title": "2. Rear Angle",
+      "description": "Boot / Tailgate, Rear Bumper, Taillights & Exhaust Tip"
+    },
+    {
+      "angleIndex": 2,
+      "angleKey": "LEFT_SIDE",
+      "title": "3. Left Side Profile",
+      "description": "Left Doors, Front/Rear Fenders, Running Board & Mirrors"
+    },
+    {
+      "angleIndex": 3,
+      "angleKey": "RIGHT_SIDE",
+      "title": "4. Right Side Profile",
+      "description": "Right Doors, Quarter Panel, Side Skirts & Window Frame"
+    },
+    {
+      "angleIndex": 4,
+      "angleKey": "ROOF_GLASS",
+      "title": "5. Roof & Glass",
+      "description": "Roof Panel, Sunroof, Front Windshield & Rear Screen"
+    },
+    {
+      "angleIndex": 5,
+      "angleKey": "CLOSEUP_DENT",
+      "title": "6. Dent / Scratch Close-Up",
+      "description": "Detailed Zoom of Existing Scratches, Dents or Deep Scrapes"
+    }
+  ]
+}

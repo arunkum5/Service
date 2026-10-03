@@ -18,6 +18,7 @@ import com.example.model.ComponentStatus
 import com.example.model.ItemCategory
 import com.example.model.JobCardStatus
 import com.example.model.VehicleType
+import com.example.util.ParsedInventoryItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -77,6 +78,99 @@ class GvdRepository(private val db: AppDatabase) {
 
     suspend fun adjustInventoryStock(id: Long, amount: Int) = withContext(Dispatchers.IO) {
         db.inventoryDao().adjustStock(id, amount)
+    }
+
+    suspend fun importIncomingPartsBatch(
+        items: List<ParsedInventoryItem>,
+        supplier: String,
+        invoiceNo: String
+    ): Pair<Int, Int> = withContext(Dispatchers.IO) {
+        val currentInventory = db.inventoryDao().getAllInventory().firstOrNull() ?: emptyList()
+        val currentBySku = currentInventory.associateBy { it.partNumber.uppercase().trim() }.toMutableMap()
+
+        var updatedCount = 0
+        var newCount = 0
+        val poItems = mutableListOf<PurchaseOrderItem>()
+
+        for (parsed in items) {
+            val sku = parsed.partNumber.uppercase().trim()
+            val existing = currentBySku[sku]
+            if (existing != null) {
+                val updated = existing.copy(
+                    stockQuantity = existing.stockQuantity + parsed.quantity,
+                    unitPrice = parsed.unitPrice
+                )
+                db.inventoryDao().updateItem(updated)
+                updatedCount++
+                poItems.add(
+                    PurchaseOrderItem(
+                        inventoryId = existing.id,
+                        partName = existing.partName,
+                        partNumber = existing.partNumber,
+                        category = existing.category.name,
+                        currentStock = existing.stockQuantity,
+                        minThreshold = existing.minThresholdAlert,
+                        orderQuantity = parsed.quantity,
+                        unitPrice = parsed.unitPrice,
+                        lineTotal = parsed.quantity * parsed.unitPrice
+                    )
+                )
+            } else {
+                val newEntity = InventoryItemEntity(
+                    partName = parsed.partName,
+                    partNumber = parsed.partNumber,
+                    category = parsed.category,
+                    compatibleType = parsed.compatibleType,
+                    unitPrice = parsed.unitPrice,
+                    stockQuantity = parsed.quantity,
+                    minThresholdAlert = parsed.minThreshold,
+                    unit = parsed.unit
+                )
+                val newId = db.inventoryDao().insertItem(newEntity)
+                newCount++
+                poItems.add(
+                    PurchaseOrderItem(
+                        inventoryId = newId,
+                        partName = parsed.partName,
+                        partNumber = parsed.partNumber,
+                        category = parsed.category.name,
+                        currentStock = 0,
+                        minThreshold = parsed.minThreshold,
+                        orderQuantity = parsed.quantity,
+                        unitPrice = parsed.unitPrice,
+                        lineTotal = parsed.quantity * parsed.unitPrice
+                    )
+                )
+            }
+        }
+
+        // Record incoming delivery / invoice
+        if (poItems.isNotEmpty()) {
+            val totalUnits = poItems.sumOf { it.orderQuantity }
+            val subtotal = poItems.sumOf { it.lineTotal }
+            val gst = subtotal * 0.18
+            val grandTotal = subtotal + gst
+            val poNumber = if (invoiceNo.isNotBlank()) invoiceNo else "INW-GVD-${System.currentTimeMillis() % 10000}"
+
+            val po = PurchaseOrderEntity(
+                poNumber = poNumber,
+                supplierName = supplier.ifBlank { "Incoming OEM Parts Wholesale Distributor" },
+                supplierAddress = "JC Road Auto Parts Wholesale Market, Bangalore",
+                supplierContact = "+91 98450 12345",
+                status = "RECEIVED",
+                totalItemsCount = poItems.size,
+                totalUnitsCount = totalUnits,
+                subtotal = subtotal,
+                gstAmount = gst,
+                grandTotal = grandTotal,
+                notes = "Inward delivery imported via Excel parts list ($poNumber). Added directly to Main Inventory.",
+                itemsJson = poItems.toJsonString(),
+                receivedAt = System.currentTimeMillis()
+            )
+            db.purchaseOrderDao().insertOrder(po)
+        }
+
+        Pair(updatedCount, newCount)
     }
 
     suspend fun bookAppointment(appointment: ServiceAppointmentEntity): Long = withContext(Dispatchers.IO) {

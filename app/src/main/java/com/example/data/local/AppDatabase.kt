@@ -34,7 +34,7 @@ import com.example.data.local.entities.VehicleInventoryEntity
         CustomerReviewEntity::class,
         PurchaseOrderEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
